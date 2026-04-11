@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/yuxsr/notificator/internal/server/service"
-	yuxsrdevpbv1 "github.com/yuxsr/yuxsr-dev-pb/gencode/go/yuxsr_dev_pb/v1"
+	yuxsrdevpbv1 "github.com/yushi-a/yuxsr-dev-pb/gencode/go/yuxsr_dev_pb/v1"
 	"google.golang.org/grpc"
 )
 
