@@ -4,7 +4,7 @@ package service
 import (
 	"context"
 
-	yuxsrdevpbv1 "github.com/yuxsr/yuxsr-dev-pb/gencode/go/yuxsr_dev_pb/v1"
+	yuxsrdevpbv1 "github.com/yushi-a/yuxsr-dev-pb/gencode/go/yuxsr_dev_pb/v1"
 )
 
 type NotificatorServiceConfig struct {
