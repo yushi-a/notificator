@@ -5,12 +5,11 @@ package cmd
 
 import (
 	"context"
-	"net"
 
 	"github.com/spf13/cobra"
-	"github.com/yuxsr/notificator/internal/client"
-	"github.com/yuxsr/notificator/internal/server"
-	"github.com/yuxsr/notificator/internal/server/service"
+	"github.com/yushi-a/notificator/internal/client"
+	"github.com/yushi-a/notificator/internal/server"
+	"github.com/yushi-a/notificator/internal/server/service"
 )
 
 // serveCmd represents the serve command
@@ -36,16 +35,9 @@ func Serve(config NotificatorConfig) error {
 		return err
 	}
 
-	server := server.RegisterNewGRPCServer(service.NotificatorServiceConfig{
+	srv := server.NewServer(":50051", service.NotificatorServiceConfig{
 		Client: clinet,
 	})
 
-	lis, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		return err
-	}
-	if err := server.Serve(lis); err != nil {
-		return err
-	}
-	return nil
+	return srv.ListenAndServe()
 }

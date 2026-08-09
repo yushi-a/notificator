@@ -1,13 +1,14 @@
-module github.com/yuxsr/notificator
+module github.com/yushi-a/notificator
 
 go 1.26.2
 
 require (
+	connectrpc.com/connect v1.20.0
 	github.com/line/line-bot-sdk-go/v7 v7.21.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
-	github.com/yushi-a/yuxsr-dev-pb/gencode/go/yuxsr_dev_pb v0.2.0
-	google.golang.org/grpc v1.80.0
+	github.com/yushi-a/yuxsr-dev-pb v0.3.0
+	golang.org/x/net v0.55.0
 )
 
 require (
@@ -22,10 +23,10 @@ require (
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/net v0.49.0 // indirect
-	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/text v0.33.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260120221211-b8f7ae30c516 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa // indirect
+	google.golang.org/grpc v1.83.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

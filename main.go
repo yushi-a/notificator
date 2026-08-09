@@ -4,8 +4,8 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package main
 
 import (
-	"github.com/yuxsr/notificator/cmd"
-	"github.com/yuxsr/notificator/internal/logging"
+	"github.com/yushi-a/notificator/cmd"
+	"github.com/yushi-a/notificator/internal/logging"
 )
 
 func main() {

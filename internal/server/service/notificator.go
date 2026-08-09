@@ -4,7 +4,8 @@ package service
 import (
 	"context"
 
-	yuxsrdevpbv1 "github.com/yushi-a/yuxsr-dev-pb/gencode/go/yuxsr_dev_pb/v1"
+	"connectrpc.com/connect"
+	notificationv1 "github.com/yushi-a/yuxsr-dev-pb/gen/go/yuxsr/notification/v1"
 )
 
 type NotificatorServiceConfig struct {
@@ -15,15 +16,18 @@ type notificatorService struct {
 	client Client
 }
 
-func NewNotificatorService(config NotificatorServiceConfig) yuxsrdevpbv1.NotificatorServiceServer {
+func NewNotificatorService(config NotificatorServiceConfig) *notificatorService {
 	return &notificatorService{
 		client: config.Client,
 	}
 }
 
-func (n *notificatorService) Notify(ctx context.Context, req *yuxsrdevpbv1.NotifyRequest) (*yuxsrdevpbv1.NotifyResponse, error) {
-	if err := n.client.Notify(ctx, req.Message); err != nil {
-		return nil, err
+func (n *notificatorService) Notify(
+	ctx context.Context,
+	req *connect.Request[notificationv1.NotifyRequest],
+) (*connect.Response[notificationv1.NotifyResponse], error) {
+	if err := n.client.Notify(ctx, req.Msg.Message); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
-	return &yuxsrdevpbv1.NotifyResponse{}, nil
+	return connect.NewResponse(&notificationv1.NotifyResponse{}), nil
 }
