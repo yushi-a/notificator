@@ -8,9 +8,9 @@ import (
 	"net/http"
 
 	"github.com/spf13/cobra"
-	"github.com/yuxsr/notificator/internal/client"
-	"github.com/yuxsr/notificator/internal/server"
-	"github.com/yuxsr/notificator/internal/server/service"
+	"github.com/yushi-a/notificator/internal/client"
+	"github.com/yushi-a/notificator/internal/server"
+	"github.com/yushi-a/notificator/internal/server/service"
 )
 
 // serveCmd represents the serve command

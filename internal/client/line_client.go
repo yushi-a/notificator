@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/line/line-bot-sdk-go/v7/linebot"
-	"github.com/yuxsr/notificator/internal/logging"
-	"github.com/yuxsr/notificator/internal/server/service"
+	"github.com/yushi-a/notificator/internal/logging"
+	"github.com/yushi-a/notificator/internal/server/service"
 )
 
 type LineClientConfig struct {

@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"connectrpc.com/connect"
-	"github.com/yuxsr/notificator/internal/server/service"
+	"github.com/yushi-a/notificator/internal/server/service"
 	notificationv1 "github.com/yushi-a/yuxsr-dev-pb/gen/go/yuxsr/notification/v1"
 	"github.com/yushi-a/yuxsr-dev-pb/gen/go/yuxsr/notification/v1/notificationv1connect"
 	"golang.org/x/net/http2"

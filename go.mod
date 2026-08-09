@@ -1,4 +1,4 @@
-module github.com/yuxsr/notificator
+module github.com/yushi-a/notificator
 
 go 1.26.2
 

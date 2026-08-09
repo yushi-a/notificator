@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"github.com/yuxsr/notificator/internal/server/service"
+	"github.com/yushi-a/notificator/internal/server/service"
 	"github.com/yushi-a/yuxsr-dev-pb/gen/go/yuxsr/notification/v1/notificationv1connect"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
