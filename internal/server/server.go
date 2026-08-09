@@ -1,14 +1,21 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/yuxsr/notificator/internal/server/service"
-	yuxsrdevpbv1 "github.com/yushi-a/yuxsr-dev-pb/gencode/go/yuxsr_dev_pb/v1"
-	"google.golang.org/grpc"
+	"github.com/yushi-a/yuxsr-dev-pb/gen/go/yuxsr/notification/v1/notificationv1connect"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 )
 
-func RegisterNewGRPCServer(config service.NotificatorServiceConfig) *grpc.Server {
+// NewHandler は Connect / gRPC / gRPC-Web を同一ポートでさばくハンドラを返す。
+func NewHandler(config service.NotificatorServiceConfig) http.Handler {
 	notificatorService := service.NewNotificatorService(config)
-	s := grpc.NewServer()
-	yuxsrdevpbv1.RegisterNotificatorServiceServer(s, notificatorService)
-	return s
+
+	mux := http.NewServeMux()
+	mux.Handle(notificationv1connect.NewNotificatorServiceHandler(notificatorService))
+
+	// h2c で TLS なしの HTTP/2 を受ける (gRPC クライアント互換のため)。
+	return h2c.NewHandler(mux, &http2.Server{})
 }

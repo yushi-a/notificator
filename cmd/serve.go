@@ -5,7 +5,7 @@ package cmd
 
 import (
 	"context"
-	"net"
+	"net/http"
 
 	"github.com/spf13/cobra"
 	"github.com/yuxsr/notificator/internal/client"
@@ -36,16 +36,9 @@ func Serve(config NotificatorConfig) error {
 		return err
 	}
 
-	server := server.RegisterNewGRPCServer(service.NotificatorServiceConfig{
+	handler := server.NewHandler(service.NotificatorServiceConfig{
 		Client: clinet,
 	})
 
-	lis, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		return err
-	}
-	if err := server.Serve(lis); err != nil {
-		return err
-	}
-	return nil
+	return http.ListenAndServe(":50051", handler)
 }
