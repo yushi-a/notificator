@@ -42,7 +42,10 @@ func h2cClient() *http.Client {
 // 同一ハンドラで処理されることを確認する。
 func TestNewHandler(t *testing.T) {
 	client := &fakeClient{}
-	srv := httptest.NewServer(NewHandler(service.NotificatorServiceConfig{Client: client}))
+
+	srv := httptest.NewUnstartedServer(NewHandler(service.NotificatorServiceConfig{Client: client}))
+	srv.Config.Protocols = Protocols()
+	srv.Start()
 	defer srv.Close()
 
 	t.Run("browser JSON POST", func(t *testing.T) {
@@ -54,7 +57,7 @@ func TestNewHandler(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer res.Body.Close()
+		defer func() { _ = res.Body.Close() }()
 		if res.StatusCode != http.StatusOK {
 			t.Fatalf("status = %d, want %d", res.StatusCode, http.StatusOK)
 		}
@@ -67,7 +70,7 @@ func TestNewHandler(t *testing.T) {
 		}
 	})
 
-	t.Run("grpc protocol over h2c", func(t *testing.T) {
+	t.Run("grpc protocol over unencrypted HTTP/2", func(t *testing.T) {
 		c := notificationv1connect.NewNotificatorServiceClient(h2cClient(), srv.URL, connect.WithGRPC())
 		if _, err := c.Notify(t.Context(), connect.NewRequest(&notificationv1.NotifyRequest{Message: "grpc"})); err != nil {
 			t.Fatal(err)

@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/spf13/cobra"
 	"github.com/yushi-a/notificator/internal/client"
@@ -36,9 +35,9 @@ func Serve(config NotificatorConfig) error {
 		return err
 	}
 
-	handler := server.NewHandler(service.NotificatorServiceConfig{
+	srv := server.NewServer(":50051", service.NotificatorServiceConfig{
 		Client: clinet,
 	})
 
-	return http.ListenAndServe(":50051", handler)
+	return srv.ListenAndServe()
 }
