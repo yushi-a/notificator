@@ -5,7 +5,7 @@ RUN go mod download
 COPY . .
 RUN make build
 
-FROM alpine:3.22
+FROM alpine:3.24
 RUN apk --no-cache add ca-certificates curl tzdata
 ENV TZ=Asia/Tokyo
 WORKDIR /usr/local/bin/
