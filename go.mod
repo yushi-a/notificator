@@ -7,7 +7,7 @@ require (
 	github.com/line/line-bot-sdk-go/v7 v7.21.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
-	github.com/yushi-a/yuxsr-dev-pb v0.3.0
+	github.com/yushi-a/yuxsr-dev-pb v0.3.1
 	golang.org/x/net v0.57.0
 )
 
@@ -27,5 +27,5 @@ require (
 	golang.org/x/text v0.40.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa // indirect
 	google.golang.org/grpc v1.83.0 // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
+	google.golang.org/protobuf v1.36.12 // indirect
 )
