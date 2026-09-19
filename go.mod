@@ -3,7 +3,7 @@ module github.com/yushi-a/notificator
 go 1.27.1
 
 require (
-	connectrpc.com/connect v1.20.0
+	connectrpc.com/connect v1.21.0
 	github.com/line/line-bot-sdk-go/v7 v7.21.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
