@@ -2,8 +2,6 @@ package server
 
 import (
 	"context"
-	"crypto/tls"
-	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -13,7 +11,6 @@ import (
 	"github.com/yushi-a/notificator/internal/server/service"
 	notificationv1 "github.com/yushi-a/yuxsr-dev-pb/gen/go/yuxsr/notification/v1"
 	"github.com/yushi-a/yuxsr-dev-pb/gen/go/yuxsr/notification/v1/notificationv1connect"
-	"golang.org/x/net/http2"
 )
 
 type fakeClient struct {
@@ -27,13 +24,11 @@ func (f *fakeClient) Notify(_ context.Context, message string) error {
 
 // h2cClient は TLS なしで HTTP/2 を話すクライアントを返す。
 func h2cClient() *http.Client {
+	protocols := new(http.Protocols)
+	protocols.SetUnencryptedHTTP2(true)
 	return &http.Client{
-		Transport: &http2.Transport{
-			AllowHTTP: true,
-			DialTLSContext: func(ctx context.Context, network, addr string, _ *tls.Config) (net.Conn, error) {
-				var d net.Dialer
-				return d.DialContext(ctx, network, addr)
-			},
+		Transport: &http.Transport{
+			Protocols: protocols,
 		},
 	}
 }
