@@ -26,6 +26,16 @@ jobs:
         uses: golangci/golangci-lint-action@v9
         with:
           version: v2.15
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: go test
+        run: go test -race ./...
   govulncheck_job:
     name: Run govulncheck
     runs-on: ubuntu-latest
@@ -36,16 +46,23 @@ jobs:
            go-version-input: ""
            go-version-file: go.mod
            go-package: ./...
-  build-and-push-image:
-    if: startsWith(github.event.ref, 'refs/tags/v')
+  image:
+    name: image
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    env:
+      # v* タグのときだけ ghcr に push する。PR と main では push せずに手元の docker に load し、
+      # 起動確認と Trivy に使う。PR では login もしない（Dependabot の PR には secrets が渡らないため）。
+      PUSH: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
       - name: Log in to the Container registry
+        if: env.PUSH == 'true'
         uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
@@ -56,10 +73,66 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Build and push Docker image
+      - name: Build (and push on tags) Docker image
+        id: build
         uses: docker/build-push-action@v7
         with:
           context: .
-          push: true
+          push: ${{ env.PUSH == 'true' }}
+          load: ${{ env.PUSH != 'true' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      # タグでは push したイメージを digest で指す。それ以外は load したイメージをタグで指す。
+      - name: Resolve image reference
+        id: ref
+        run: |
+          if [ "${PUSH}" = "true" ]; then
+            echo "image=${REGISTRY}/${IMAGE_NAME}@${DIGEST}" >> "$GITHUB_OUTPUT"
+          else
+            echo "image=${REGISTRY}/${IMAGE_NAME}:${VERSION}" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+          VERSION: ${{ steps.meta.outputs.version }}
+      # ビルドが通るだけでは実行層の壊れ（起動しない、curl が無い）を拾えない。
+      # serve をダミーの LINE 設定で起動し、:50051 が HTTP に応答することを確かめる。
+      - name: Smoke test
+        run: |
+          docker run --rm --entrypoint sh "${IMAGE}" -c 'id -u | grep -qv "^0$" && command -v curl'
+          docker run -d --name smoke \
+            -e LINE_CHANNEL_SECRET=dummy \
+            -e LINE_CHANNEL_ACCESS_TOKEN=dummy \
+            -e LINE_USER_ID=dummy \
+            "${IMAGE}"
+          for _ in $(seq 1 15); do
+            if docker exec smoke curl -s -o /dev/null http://localhost:50051/; then
+              echo "server is responding"
+              docker rm -f smoke > /dev/null
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs smoke
+          docker rm -f smoke > /dev/null
+          exit 1
+        env:
+          IMAGE: ${{ steps.ref.outputs.image }}
+      # HIGH は表に出すだけで落とさない。先に回して、CRITICAL で落ちても一覧は残るようにする。
+      - name: Trivy (HIGH, report only)
+        # Trivy の Action はタグの付け替え被害の前例があるため、コミット SHA で固定する。
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ steps.ref.outputs.image }}
+          severity: HIGH
+          ignore-unfixed: true
+          exit-code: "0"
+      - name: Trivy (CRITICAL)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ steps.ref.outputs.image }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          skip-setup-trivy: true
