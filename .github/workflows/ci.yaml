@@ -49,6 +49,7 @@ jobs:
   image:
     name: image
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       packages: write
@@ -80,6 +81,9 @@ jobs:
           context: .
           push: ${{ env.PUSH == 'true' }}
           load: ${{ env.PUSH != 'true' }}
+          # setup-buildx（docker-container ドライバ）では provenance の attestation が既定で付き、
+          # push するイメージが OCI image index になる。従来（docker ドライバ）と同じ単一マニフェストに揃える。
+          provenance: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
@@ -107,7 +111,7 @@ jobs:
             -e LINE_USER_ID=dummy \
             "${IMAGE}"
           for _ in $(seq 1 15); do
-            if docker exec smoke curl -s -o /dev/null http://localhost:50051/; then
+            if docker exec smoke curl -s --max-time 2 -o /dev/null http://localhost:50051/; then
               echo "server is responding"
               docker rm -f smoke > /dev/null
               exit 0
