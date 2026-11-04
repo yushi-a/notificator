@@ -48,6 +48,8 @@ jobs:
            go-package: ./...
   image:
     name: image
+    # lint・test・govulncheck が通ったものだけをビルドし、タグのときは push する
+    needs: [golangci, test, govulncheck_job]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
